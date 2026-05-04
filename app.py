@@ -5,23 +5,21 @@ from transformers import AutoImageProcessor, AutoModelForImageClassification
 from supabase import create_client
 
 # =============================
-# CONFIG (nur Layout erweitert)
+# CONFIG
 # =============================
 st.set_page_config(page_title="🌿 Wildpflanzen KI", page_icon="🌱", layout="wide")
 
 # =============================
-# 🌿 ROOTWISE DESIGN (übertragen)
+# 🌿 ROOTWISE DESIGN
 # =============================
 st.markdown("""
 <style>
 
-/* Hintergrund */
 .stApp {
     background-color: #E8F5E9;
     color: black;
 }
 
-/* global text schwarz */
 html, body, [class*="css"] {
     color: black !important;
 }
@@ -45,14 +43,12 @@ h1, h2, h3, h4, h5, h6, p, span, div {
     text-align: center;
     margin-top: 20px;
     margin-bottom: 0px;
-    color: black;
     text-shadow: 0px 2px 0px rgba(0,0,0,0.15);
 }
 
 .hero-subtitle {
     text-align: center;
     font-size: 18px;
-    margin-top: 5px;
     opacity: 0.85;
 }
 
@@ -73,58 +69,33 @@ h1, h2, h3, h4, h5, h6, p, span, div {
     border-radius: 10px;
 }
 
-/* SOIL CARD */
+/* CARDS */
 .soil-card {
     background-color: #D6EBFF;
     padding: 15px;
     border-radius: 12px;
     margin-bottom: 10px;
-    color: black;
 }
 
-/* RECOMMENDATION */
 .recommendation-card {
     background-color: #FDECEF;
     padding: 15px;
     border-radius: 12px;
-    margin-bottom: 10px;
-    color: black;
 }
 
-/* LABELS */
-.label {
-    font-weight: 700;
-    display: block;
-    margin-bottom: 4px;
-}
-
-.value {
-    font-weight: 400;
-    opacity: 0.9;
-}
-
-/* STATUS BOX (aus deiner ersten App behalten, nur angepasst) */
+/* STATUS */
 .status-box {
     padding: 15px;
     border-radius: 12px;
     margin-top: 10px;
-    font-size: 16px;
 }
 
-.success {
-    background-color: #e6f4ea;
-    border-left: 6px solid #2e7d32;
-}
+.success { background: #e6f4ea; border-left: 6px solid #2e7d32; }
+.warning { background: #fff8e1; border-left: 6px solid #f9a825; }
+.error { background: #fdecea; border-left: 6px solid #c62828; }
 
-.warning {
-    background-color: #fff8e1;
-    border-left: 6px solid #f9a825;
-}
-
-.error {
-    background-color: #fdecea;
-    border-left: 6px solid #c62828;
-}
+.label { font-weight: 700; }
+.value { opacity: 0.9; }
 
 </style>
 """, unsafe_allow_html=True)
@@ -137,7 +108,7 @@ SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # =============================
-# HEADER (neu)
+# HEADER
 # =============================
 st.markdown("""
 <div class="hero-container">
@@ -146,8 +117,8 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-st.title("🌿 Wildpflanzen & Bodenanalyse (AI + DB)")
-st.write("Lade ein Bild einer Pflanze hoch.")
+st.title("🌿 Wildpflanzen & Bodenanalyse")
+st.write("Bild hochladen und Pflanze analysieren")
 
 # =============================
 # MODEL
@@ -162,65 +133,46 @@ def load_model():
 processor, model = load_model()
 
 # =============================
-# BOTANICAL MAPPING (unverändert)
+# MAPPING (FINAL DB READY)
 # =============================
 def map_plant(label):
 
     label = label.lower()
 
-    result = {
-        "raw": label,
-        "db_key": "unbekannt",
-        "group": "unbekannt",
-        "note": None
-    }
+    if "urtica" in label or "brennnessel" in label:
+        return {"db_key": "brennnessel", "group": "Brennnessel"}
 
-    if "urtica" in label:
-        result["db_key"] = "brennnessel"
-        result["group"] = "Echte Brennnessel (Urtica)"
+    if "taraxacum" in label or "löwenzahn" in label:
+        return {"db_key": "loewenzahn", "group": "Löwenzahn"}
 
-    elif "lamium" in label:
-        result["db_key"] = "brennnessel"
-        result["group"] = "Taubnessel (Lamium)"
-        result["note"] = "⚠️ KEINE echte Brennnessel"
+    if "trifolium" in label or "klee" in label:
+        return {"db_key": "klee", "group": "Klee"}
 
-    elif "taraxacum" in label:
-        result["db_key"] = "loewenzahn"
-        result["group"] = "Löwenzahn"
+    if "achillea" in label:
+        return {"db_key": "schafgarbe", "group": "Schafgarbe"}
 
-    elif "trifolium" in label:
-        result["db_key"] = "klee"
-        result["group"] = "Klee"
+    if "thymus" in label:
+        return {"db_key": "thymian", "group": "Thymian"}
 
-    elif "calluna" in label:
-        result["db_key"] = "heidekraut"
-        result["group"] = "Heidekraut"
+    if "matricaria" in label or "kamille" in label:
+        return {"db_key": "kamille", "group": "Kamille"}
 
-    elif "thymus" in label:
-        result["db_key"] = "thymian"
-        result["group"] = "Thymian"
+    if "distel" in label or "cirsium" in label:
+        return {"db_key": "distel", "group": "Distel"}
 
-    elif "matricaria" in label or "chamomilla" in label:
-        result["db_key"] = "kamille"
-        result["group"] = "Kamille"
+    if "caltha" in label:
+        return {"db_key": "sumpfdotterblume", "group": "Sumpfdotterblume"}
 
-    elif "dryopteris" in label or "pteridium" in label:
-        result["db_key"] = "farn"
-        result["group"] = "Farn"
+    if "carex" in label or "segge" in label:
+        return {"db_key": "seggen", "group": "Seggen"}
 
-    elif "achillea" in label:
-        result["db_key"] = "schafgabe"
-        result["group"] = "Schafgarbe"
+    if "calluna" in label:
+        return {"db_key": "heidekraut", "group": "Heidekraut"}
 
-    elif "caltha" in label:
-        result["db_key"] = "sumpfdotterblume"
-        result["group"] = "Sumpfdotterblume"
+    if "dryopteris" in label or "farn" in label:
+        return {"db_key": "farn", "group": "Farn"}
 
-    elif "carex" in label:
-        result["db_key"] = "seggen"
-        result["group"] = "Seggen"
-
-    return result
+    return {"db_key": "unbekannt", "group": "unbekannt"}
 
 # =============================
 # SUPABASE
@@ -239,7 +191,7 @@ if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
     st.image(image, use_column_width=True)
 
-    st.write("🔍 Analysiere Pflanze...")
+    st.write("🔍 Analyse läuft...")
 
     inputs = processor(images=image, return_tensors="pt")
 
@@ -252,62 +204,73 @@ if uploaded_file:
     labels = [model.config.id2label[i.item()] for i in topk.indices[0]]
     scores = topk.values[0]
 
-    raw_label = labels[0]
-    confidence = float(scores[0])
+    top3 = list(zip(labels, scores))
+
+    raw_label = top3[0][0]
+    confidence = float(top3[0][1])
 
     st.subheader("🌿 Ergebnisse")
 
-    for label, score in zip(labels, scores):
-        st.write(f"👉 {label} ({round(score.item()*100,2)}%)")
+    for l, s in top3:
+        st.write(f"👉 {l} ({round(float(s)*100,2)}%)")
 
-    st.success(f"Top-Erkennung: {raw_label} ({round(confidence*100,2)}%)")
+    st.success(f"Top: {raw_label} ({round(confidence*100,2)}%)")
 
-    # =============================
-    # MAPPING
-    # =============================
     mapped = map_plant(raw_label)
     plant_key = mapped["db_key"]
-    plant_data = get_plant_data(plant_key) if plant_key != "unbekannt" else None
 
-    st.subheader("🌱 Pflanzen-Einordnung")
-    st.write("Art:", mapped["raw"])
-    st.write("Gruppe:", mapped["group"])
-
-    if mapped["note"]:
-        st.warning(mapped["note"])
-
-    st.info(f"DB-Key: {plant_key}")
+    plant_data = None
 
     # =============================
-    # UI LOGIK (nur Design angepasst)
+    # < 50% UNSICHER
     # =============================
-
-    if plant_key == "unbekannt":
+    if confidence < 0.50:
 
         st.markdown("""
         <div class="status-box warning">
-        ⚠️ <b>Unsichere Erkennung</b><br><br>
-        Pflanze konnte nicht eindeutig zugeordnet werden.
+        ⚠️ Unsichere Erkennung – bitte neues Bild aufnehmen
         </div>
         """, unsafe_allow_html=True)
 
-    elif plant_data is None:
+    # =============================
+    # 50–70% AUSWAHL
+    # =============================
+    elif confidence < 0.70:
 
-        st.markdown(f"""
-        <div class="status-box error">
-        🌿 <b>Pflanze erkannt – kein DB Eintrag</b><br><br>
-        {mapped['group']}
-        </div>
-        """, unsafe_allow_html=True)
+        st.warning("⚠️ Mittlere Sicherheit – bitte auswählen")
 
+        options = {}
+        choices = []
+
+        for l, s in top3:
+            m = map_plant(l)
+            if m["db_key"] != "unbekannt":
+                text = f"{m['group']} ({round(float(s)*100,1)}%)"
+                choices.append(text)
+                options[text] = m["db_key"]
+
+        if choices:
+
+            choice = st.selectbox("Auswahl", choices)
+
+            if st.button("Weiter"):
+
+                plant_key = options[choice]
+                plant_data = get_plant_data(plant_key)
+
+    # =============================
+    # > 70% DIREKT
+    # =============================
     else:
 
-        st.markdown(f"""
-        <div class="status-box success">
-        🌿 <b>Pflanze erkannt & zugeordnet</b><br><br>
-        {mapped['group']}
-        </div>
-        """, unsafe_allow_html=True)
+        st.success("✔️ Sicher erkannt")
+
+        plant_data = get_plant_data(plant_key)
+
+    # =============================
+    # OUTPUT DB
+    # =============================
+    if plant_data:
 
         st.markdown("### 🌱 Bodenanalyse")
 
@@ -316,24 +279,24 @@ if uploaded_file:
         with col1:
             st.markdown(f"""
             <div class="soil-card">
-                <span class="label">Boden</span>
-                <span class="value">{plant_data.get("soil")}</span>
+            <div class="label">Boden</div>
+            <div class="value">{plant_data['soil']}</div>
             </div>
             """, unsafe_allow_html=True)
 
         with col2:
             st.markdown(f"""
             <div class="soil-card">
-                <span class="label">Feuchtigkeit</span>
-                <span class="value">{plant_data.get("moisture")}</span>
+            <div class="label">Feuchtigkeit</div>
+            <div class="value">{plant_data['moisture']}</div>
             </div>
             """, unsafe_allow_html=True)
 
         with col3:
             st.markdown(f"""
             <div class="soil-card">
-                <span class="label">Sonne</span>
-                <span class="value">{plant_data.get("sun")}</span>
+            <div class="label">Sonne</div>
+            <div class="value">{plant_data['sun']}</div>
             </div>
             """, unsafe_allow_html=True)
 
@@ -341,6 +304,9 @@ if uploaded_file:
 
         st.markdown(f"""
         <div class="recommendation-card">
-            {plant_data.get("recommendations")}
+        {plant_data['recommendations']}
         </div>
         """, unsafe_allow_html=True)
+
+    elif confidence >= 0.50:
+        st.error("Keine Datenbankdaten gefunden")
