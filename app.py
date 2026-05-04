@@ -300,6 +300,8 @@ if uploaded_file:
             </div>
             """, unsafe_allow_html=True)
 
+        st.info(f"📂 Datenbank-Kategorie: {plant_key} ({mapped['group']})")
+
         st.markdown("### 🌿 Empfehlungen")
 
         st.markdown(f"""
