@@ -5,10 +5,105 @@ from transformers import AutoImageProcessor, AutoModelForImageClassification
 from supabase import create_client
 
 # =============================
-# 🌿 UI STYLES
+# CONFIG (nur Layout erweitert)
+# =============================
+st.set_page_config(page_title="🌿 Wildpflanzen KI", page_icon="🌱", layout="wide")
+
+# =============================
+# 🌿 ROOTWISE DESIGN (übertragen)
 # =============================
 st.markdown("""
 <style>
+
+/* Hintergrund */
+.stApp {
+    background-color: #E8F5E9;
+    color: black;
+}
+
+/* global text schwarz */
+html, body, [class*="css"] {
+    color: black !important;
+}
+
+h1, h2, h3, h4, h5, h6, p, span, div {
+    color: black !important;
+}
+
+/* HEADER */
+.hero-container {
+    position: sticky;
+    top: 0;
+    background: linear-gradient(to bottom, #E8F5E9 85%, rgba(232,245,233,0));
+    padding-bottom: 10px;
+    z-index: 10;
+}
+
+.hero-title {
+    font-size: 54px;
+    font-weight: 800;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 0px;
+    color: black;
+    text-shadow: 0px 2px 0px rgba(0,0,0,0.15);
+}
+
+.hero-subtitle {
+    text-align: center;
+    font-size: 18px;
+    margin-top: 5px;
+    opacity: 0.85;
+}
+
+/* BUTTONS */
+.stButton>button {
+    background-color: #FADADD;
+    color: black !important;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 16px;
+    border: none;
+}
+
+/* FILE UPLOAD */
+.stFileUploader {
+    border: 2px dashed #90CAF9;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+/* SOIL CARD */
+.soil-card {
+    background-color: #D6EBFF;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    color: black;
+}
+
+/* RECOMMENDATION */
+.recommendation-card {
+    background-color: #FDECEF;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    color: black;
+}
+
+/* LABELS */
+.label {
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.value {
+    font-weight: 400;
+    opacity: 0.9;
+}
+
+/* STATUS BOX (aus deiner ersten App behalten, nur angepasst) */
 .status-box {
     padding: 15px;
     border-radius: 12px;
@@ -30,6 +125,7 @@ st.markdown("""
     background-color: #fdecea;
     border-left: 6px solid #c62828;
 }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -41,14 +137,20 @@ SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # =============================
-# SEITE
+# HEADER (neu)
 # =============================
-st.set_page_config(page_title="🌿 Wildpflanzen KI", page_icon="🌱")
+st.markdown("""
+<div class="hero-container">
+    <div class="hero-title">Wildpflanzen KI</div>
+    <div class="hero-subtitle">Wildpflanzen scannen. Boden verstehen.</div>
+</div>
+""", unsafe_allow_html=True)
+
 st.title("🌿 Wildpflanzen & Bodenanalyse (AI + DB)")
 st.write("Lade ein Bild einer Pflanze hoch.")
 
 # =============================
-# MODELL
+# MODEL
 # =============================
 @st.cache_resource
 def load_model():
@@ -60,7 +162,7 @@ def load_model():
 processor, model = load_model()
 
 # =============================
-# 🌿 BOTANISCHES MAPPING (sauber getrennt)
+# BOTANICAL MAPPING (unverändert)
 # =============================
 def map_plant(label):
 
@@ -73,7 +175,6 @@ def map_plant(label):
         "note": None
     }
 
-    # 🌿 Brennnessel vs Taubnessel
     if "urtica" in label:
         result["db_key"] = "brennnessel"
         result["group"] = "Echte Brennnessel (Urtica)"
@@ -81,7 +182,7 @@ def map_plant(label):
     elif "lamium" in label:
         result["db_key"] = "brennnessel"
         result["group"] = "Taubnessel (Lamium)"
-        result["note"] = "⚠️ KEINE echte Brennnessel – nur ähnliche Pflanzenfamilie"
+        result["note"] = "⚠️ KEINE echte Brennnessel"
 
     elif "taraxacum" in label:
         result["db_key"] = "loewenzahn"
@@ -125,11 +226,7 @@ def map_plant(label):
 # SUPABASE
 # =============================
 def get_plant_data(plant_key):
-    res = supabase.table("plants") \
-        .select("*") \
-        .eq("plant_key", plant_key) \
-        .execute()
-
+    res = supabase.table("plants").select("*").eq("plant_key", plant_key).execute()
     return res.data[0] if res.data else None
 
 # =============================
@@ -144,9 +241,6 @@ if uploaded_file:
 
     st.write("🔍 Analysiere Pflanze...")
 
-    # =============================
-    # KI PREDICTION
-    # =============================
     inputs = processor(images=image, return_tensors="pt")
 
     with torch.no_grad():
@@ -166,7 +260,7 @@ if uploaded_file:
     for label, score in zip(labels, scores):
         st.write(f"👉 {label} ({round(score.item()*100,2)}%)")
 
-    st.success(f"🌿 Top-Erkennung: {raw_label} ({round(confidence*100,2)}%)")
+    st.success(f"Top-Erkennung: {raw_label} ({round(confidence*100,2)}%)")
 
     # =============================
     # MAPPING
@@ -176,8 +270,8 @@ if uploaded_file:
     plant_data = get_plant_data(plant_key) if plant_key != "unbekannt" else None
 
     st.subheader("🌱 Pflanzen-Einordnung")
-    st.write("🔬 Art:", mapped["raw"])
-    st.write("🌿 Gruppe:", mapped["group"])
+    st.write("Art:", mapped["raw"])
+    st.write("Gruppe:", mapped["group"])
 
     if mapped["note"]:
         st.warning(mapped["note"])
@@ -185,52 +279,68 @@ if uploaded_file:
     st.info(f"DB-Key: {plant_key}")
 
     # =============================
-    # 🧠 UI LOGIK (CLEAN)
+    # UI LOGIK (nur Design angepasst)
     # =============================
 
-    # ❌ UNSICHER
     if plant_key == "unbekannt":
 
-        st.markdown(f"""
+        st.markdown("""
         <div class="status-box warning">
         ⚠️ <b>Unsichere Erkennung</b><br><br>
-        Die Pflanze konnte nicht eindeutig zugeordnet werden.<br>
-        Bitte anderes Bild versuchen.
+        Pflanze konnte nicht eindeutig zugeordnet werden.
         </div>
         """, unsafe_allow_html=True)
 
-    # 🌿 ÄHNLICH, ABER KEIN DB MATCH
     elif plant_data is None:
 
         st.markdown(f"""
         <div class="status-box error">
-        🌿 <b>Pflanze erkannt – keine exakte Datenbank-Entsprechung</b><br><br>
-
-        🔬 Erkannt: <b>{mapped['group']}</b><br>
-        ⚠️ Hinweis: Diese Pflanze ist nicht direkt in der Datenbank hinterlegt.<br>
-        👉 Es wird eine ähnliche Pflanzenkategorie als Referenz genutzt.
+        🌿 <b>Pflanze erkannt – kein DB Eintrag</b><br><br>
+        {mapped['group']}
         </div>
         """, unsafe_allow_html=True)
 
-        st.subheader("🌱 Referenz-Bodenanalyse")
-        st.write("⚠️ basiert auf ähnlicher Pflanzenklasse:", plant_key)
-        st.write("Kohl, Tomate, Gurke")
-
-    # 🌿 EXAKTER TREFFER
     else:
 
         st.markdown(f"""
         <div class="status-box success">
         🌿 <b>Pflanze erkannt & zugeordnet</b><br><br>
-        {mapped['group']}<br>
-        Exakter Datenbankeintrag vorhanden.
+        {mapped['group']}
         </div>
         """, unsafe_allow_html=True)
 
-        st.subheader("🌱 Bodenanalyse")
-        st.write("Boden:", plant_data.get("soil"))
-        st.write("Feuchtigkeit:", plant_data.get("moisture"))
-        st.write("Sonne:", plant_data.get("sun"))
+        st.markdown("### 🌱 Bodenanalyse")
 
-        st.subheader("🌿 Empfehlungen")
-        st.success(plant_data.get("recommendations"))
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            st.markdown(f"""
+            <div class="soil-card">
+                <span class="label">Boden</span>
+                <span class="value">{plant_data.get("soil")}</span>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with col2:
+            st.markdown(f"""
+            <div class="soil-card">
+                <span class="label">Feuchtigkeit</span>
+                <span class="value">{plant_data.get("moisture")}</span>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with col3:
+            st.markdown(f"""
+            <div class="soil-card">
+                <span class="label">Sonne</span>
+                <span class="value">{plant_data.get("sun")}</span>
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.markdown("### 🌿 Empfehlungen")
+
+        st.markdown(f"""
+        <div class="recommendation-card">
+            {plant_data.get("recommendations")}
+        </div>
+        """, unsafe_allow_html=True)
