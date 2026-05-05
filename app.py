@@ -84,7 +84,10 @@ html, body, [class*="css"] {
 }
 
 .success { background: #e6f4ea; border-left: 6px solid #2e7d32; }
-.warning { background: #fff8e1; border-left: 6px solid #f9a825; }
+.warning {
+    background: #f2f2f2;
+    border-left: 6px solid #9e9e9e;
+}
 .error { background: #fdecea; border-left: 6px solid #c62828; } 
 
 .label { font-weight: 700; }
