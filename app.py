@@ -215,10 +215,12 @@ if uploaded_file:
 
     st.subheader("Ergebnisse")
 
-    for l, s in top3:
-        st.write(f"{l} ({round(float(s)*100,2)}%)")
-
-    st.success(f"Top: {raw_label} ({round(confidence*100,2)}%)")
+    # 🔥 Top-Ergebnis markieren
+    for i, (l, s) in enumerate(top3):
+        if i == 0:
+            st.markdown(f"**{l} ({round(float(s)*100,2)}%) — Top-Auswahl**")
+        else:
+            st.write(f"{l} ({round(float(s)*100,2)}%)")
 
     mapped = map_plant(raw_label)
     plant_key = mapped["db_key"]
