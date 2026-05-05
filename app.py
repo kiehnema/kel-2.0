@@ -5,17 +5,17 @@ from transformers import AutoImageProcessor, AutoModelForImageClassification
 from supabase import create_client
 
 # =============================
-# 🚀 RAM FIX
+# RAM FIX
 # =============================
 device = torch.device("cpu")
 
 # =============================
 # CONFIG
 # =============================
-st.set_page_config(page_title="🌿 Wildpflanzen KI", page_icon="🌱", layout="wide")
+st.set_page_config(page_title="Wildpflanzen KI", layout="wide")
 
 # =============================
-# 🌿 DESIGN (RootWise)
+# DESIGN
 # =============================
 st.markdown("""
 <style>
@@ -57,10 +57,12 @@ html, body, [class*="css"] {
     border: none;
 }
 
+/* Upload ohne gestrichelte Linie */
 .stFileUploader {
-    border: 2px dashed #90CAF9;
+    border: none !important;
     padding: 15px;
     border-radius: 10px;
+    background-color: #ffffff;
 }
 
 .soil-card {
@@ -108,10 +110,10 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-st.title("🌿 Analyse starten")
+st.title("Analyse starten")
 
 # =============================
-# MODEL (RAM OPTIMIERT)
+# MODEL
 # =============================
 @st.cache_resource
 def load_model():
@@ -131,7 +133,7 @@ def load_model():
 processor, model = load_model()
 
 # =============================
-# MAPPING (DB READY)
+# MAPPING
 # =============================
 def map_plant(label):
 
@@ -186,14 +188,13 @@ uploaded_file = st.file_uploader("Bild hochladen", type=["jpg", "png", "jpeg"])
 
 if uploaded_file:
 
-    # 🔥 RAM FIX: Image verkleinern
     image = Image.open(uploaded_file)
     image.thumbnail((512, 512))
     image = image.convert("RGB")
 
     st.image(image, use_column_width=True)
 
-    st.write("🔍 Analyse läuft...")
+    st.write("Analyse läuft...")
 
     inputs = processor(images=image, return_tensors="pt")
     inputs = {k: v.to(device) for k, v in inputs.items()}
@@ -212,10 +213,10 @@ if uploaded_file:
     raw_label = top3[0][0]
     confidence = float(top3[0][1])
 
-    st.subheader("🌿 Ergebnisse")
+    st.subheader("Ergebnisse")
 
     for l, s in top3:
-        st.write(f"👉 {l} ({round(float(s)*100,2)}%)")
+        st.write(f"{l} ({round(float(s)*100,2)}%)")
 
     st.success(f"Top: {raw_label} ({round(confidence*100,2)}%)")
 
@@ -224,23 +225,17 @@ if uploaded_file:
 
     plant_data = None
 
-    # =============================
-    # <50% UNSICHER
-    # =============================
     if confidence < 0.50:
 
         st.markdown("""
         <div class="status-box warning">
-        ⚠️ Unsicher erkannt – bitte neues Bild
+        Unsicher erkannt – bitte neues Bild
         </div>
         """, unsafe_allow_html=True)
 
-    # =============================
-    # 50–70% AUSWAHL
-    # =============================
     elif confidence < 0.70:
 
-        st.warning("⚠️ Mittlere Sicherheit – Auswahl nötig")
+        st.warning("Mittlere Sicherheit – Auswahl nötig")
 
         options = {}
         choices = []
@@ -261,27 +256,21 @@ if uploaded_file:
                 plant_key = options[choice]
                 plant_data = get_plant_data(plant_key)
 
-    # =============================
-    # >70% DIREKT
-    # =============================
     else:
 
-        st.success("✔️ Sicher erkannt")
+        st.success("Sicher erkannt")
 
         plant_data = get_plant_data(plant_key)
 
-    # =============================
-    # OUTPUT
-    # =============================
     if plant_data:
 
         st.markdown(f"""
         <div class="status-box success">
-        📂 Kategorie: <b>{mapped['group']}</b> ({plant_key})
+        Kategorie: <b>{mapped['group']}</b> ({plant_key})
         </div>
         """, unsafe_allow_html=True)
 
-        st.markdown("### 🌱 Bodenanalyse")
+        st.markdown("### Bodenanalyse")
 
         col1, col2, col3 = st.columns(3)
 
@@ -294,7 +283,7 @@ if uploaded_file:
         with col3:
             st.markdown(f"<div class='soil-card'><b>Sonne</b><br>{plant_data['sun']}</div>", unsafe_allow_html=True)
 
-        st.markdown("### 🌿 Empfehlungen")
+        st.markdown("### Empfehlungen")
 
         st.markdown(f"""
         <div class="recommendation-card">
