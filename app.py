@@ -122,7 +122,11 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-st.title("Analyse starten")
+st.markdown("""
+<h2 style="text-align:center; font-size:28px; margin-top:10px;">
+Analyse starten
+</h2>
+""", unsafe_allow_html=True)
 
 # =============================
 # MODEL
