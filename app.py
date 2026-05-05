@@ -20,15 +20,17 @@ st.set_page_config(page_title="Wildpflanzen KI", layout="wide")
 st.markdown("""
 <style>
 
+/* Hintergrund */
 .stApp {
     background-color: #E8F5E9;
-    color: black;
 }
 
-html, body, [class*="css"] {
-    color: black !important;
+/* 🔥 ALLE SCHRIFTEN SCHWARZ */
+* {
+    color: #000000 !important;
 }
 
+/* Hero */
 .hero-container {
     position: sticky;
     top: 0;
@@ -48,9 +50,9 @@ html, body, [class*="css"] {
     opacity: 0.85;
 }
 
+/* Button */
 .stButton>button {
     background-color: #FADADD;
-    color: black !important;
     border-radius: 10px;
     padding: 10px 16px;
     font-size: 16px;
@@ -65,6 +67,7 @@ html, body, [class*="css"] {
     background-color: #ffffff;
 }
 
+/* Cards */
 .soil-card {
     background-color: #D6EBFF;
     padding: 15px;
@@ -77,18 +80,30 @@ html, body, [class*="css"] {
     border-radius: 12px;
 }
 
+/* Status Box Basis */
 .status-box {
     padding: 15px;
     border-radius: 12px;
     margin-top: 10px;
 }
 
-.success { background: #e6f4ea; border-left: 6px solid #2e7d32; }
-.warning { background: #fff8e1; border-left: 6px solid #f9a825; }
-.error { background: #fdecea; border-left: 6px solid #c62828; } 
+/* Erfolgsbox */
+.success {
+    background: #e6f4ea;
+    border-left: 6px solid #2e7d32;
+}
 
-.label { font-weight: 700; }
-.value { opacity: 0.9; }
+/* ⚠️ NEU: Pastell statt Rot/Gelb */
+.warning {
+    background: #F3F6F4;
+    border-left: 6px solid #A8B5A2;
+}
+
+/* (optional bleibt drin, aber nicht mehr genutzt) */
+.error {
+    background: #fdecea;
+    border-left: 6px solid #c62828;
+}
 
 </style>
 """, unsafe_allow_html=True)
@@ -230,7 +245,7 @@ if uploaded_file:
 
         st.markdown("""
         <div class="status-box warning">
-        Unsicher erkannt – bitte neues Bild
+        Diese Pflanze ist noch nicht in unserer Datenbank vorhanden. Daher können wir aktuell keine Empfehlungen geben.
         </div>
         """, unsafe_allow_html=True)
 
@@ -293,4 +308,8 @@ if uploaded_file:
         """, unsafe_allow_html=True)
 
     elif confidence >= 0.50:
-        st.info("Diese Pflanze ist noch nicht in unserer Datenbank vorhanden. Daher können wir aktuell keine Empfehlungen geben.")
+        st.markdown("""
+        <div class="status-box warning">
+        Diese Pflanze ist noch nicht in unserer Datenbank vorhanden. Daher können wir aktuell keine Empfehlungen geben.
+        </div>
+        """, unsafe_allow_html=True)
