@@ -20,17 +20,14 @@ st.set_page_config(page_title="Wildpflanzen KI", layout="wide")
 st.markdown("""
 <style>
 
-/* Hintergrund */
 .stApp {
     background-color: #E8F5E9;
 }
 
-/* 🔥 ALLE SCHRIFTEN SCHWARZ */
 * {
     color: #000000 !important;
 }
 
-/* Hero */
 .hero-container {
     position: sticky;
     top: 0;
@@ -50,7 +47,6 @@ st.markdown("""
     opacity: 0.85;
 }
 
-/* Button */
 .stButton>button {
     background-color: #FADADD;
     border-radius: 10px;
@@ -59,7 +55,6 @@ st.markdown("""
     border: none;
 }
 
-/* Upload */
 .stFileUploader {
     border: none !important;
     padding: 15px;
@@ -67,7 +62,6 @@ st.markdown("""
     background-color: #ffffff;
 }
 
-/* Cards */
 .soil-card {
     background-color: #D6EBFF;
     padding: 15px;
@@ -80,7 +74,6 @@ st.markdown("""
     border-radius: 12px;
 }
 
-/* Status Box */
 .status-box {
     padding: 15px;
     border-radius: 12px;
@@ -95,11 +88,6 @@ st.markdown("""
 .warning {
     background: #F3F6F4;
     border-left: 6px solid #A8B5A2;
-}
-
-.error {
-    background: #fdecea;
-    border-left: 6px solid #c62828;
 }
 
 </style>
@@ -123,7 +111,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("""
-<h2 style="text-align:left; font-size:28px; margin-top:10px;">
+<h2 style="font-size:28px; margin-top:10px;">
 Analyse starten
 </h2>
 """, unsafe_allow_html=True)
@@ -158,39 +146,28 @@ processor, model = load_model()
 # MAPPING
 # =============================
 def map_plant(label):
-
     label = label.lower()
 
     if "urtica" in label or "brennnessel" in label:
         return {"db_key": "brennnessel", "group": "Brennnessel"}
-
     if "taraxacum" in label:
         return {"db_key": "loewenzahn", "group": "Löwenzahn"}
-
     if "trifolium" in label:
         return {"db_key": "klee", "group": "Klee"}
-
     if "achillea" in label:
         return {"db_key": "schafgarbe", "group": "Schafgarbe"}
-
     if "thymus" in label:
         return {"db_key": "thymian", "group": "Thymian"}
-
     if "matricaria" in label:
         return {"db_key": "kamille", "group": "Kamille"}
-
     if "cirsium" in label:
         return {"db_key": "distel", "group": "Distel"}
-
     if "caltha" in label:
         return {"db_key": "sumpfdotterblume", "group": "Sumpfdotterblume"}
-
     if "carex" in label:
         return {"db_key": "seggen", "group": "Seggen"}
-
     if "calluna" in label:
         return {"db_key": "heidekraut", "group": "Heidekraut"}
-
     if "dryopteris" in label:
         return {"db_key": "farn", "group": "Farn"}
 
@@ -214,13 +191,13 @@ if uploaded_file:
     image.thumbnail((512, 512))
     image = image.convert("RGB")
 
-    # 📌 ZENTRIERTES BILD
     col1, col2, col3 = st.columns([1, 2, 1])
-
     with col2:
         st.image(image, width=350)
 
-    st.write("Analyse läuft...")
+    # ✅ LOADING PLACEHOLDER
+    status = st.empty()
+    status.write("Analyse läuft...")
 
     inputs = processor(images=image, return_tensors="pt")
     inputs = {k: v.to(device) for k, v in inputs.items()}
@@ -238,6 +215,9 @@ if uploaded_file:
 
     raw_label = top3[0][0]
     confidence = float(top3[0][1])
+
+    # ❌ LOADING VERSCHWINDEN LASSEN
+    status.empty()
 
     st.subheader("Ergebnisse")
 
@@ -279,14 +259,11 @@ if uploaded_file:
             choice = st.selectbox("Auswahl", choices)
 
             if st.button("Weiter"):
-
                 plant_key = options[choice]
                 plant_data = get_plant_data(plant_key)
 
     else:
-
         st.success("Sicher erkannt")
-
         plant_data = get_plant_data(plant_key)
 
     if plant_data:
@@ -303,10 +280,8 @@ if uploaded_file:
 
         with col1:
             st.markdown(f"<div class='soil-card'><b>Boden</b><br>{plant_data['soil']}</div>", unsafe_allow_html=True)
-
         with col2:
             st.markdown(f"<div class='soil-card'><b>Feuchtigkeit</b><br>{plant_data['moisture']}</div>", unsafe_allow_html=True)
-
         with col3:
             st.markdown(f"<div class='soil-card'><b>Sonne</b><br>{plant_data['sun']}</div>", unsafe_allow_html=True)
 
