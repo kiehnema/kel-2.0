@@ -59,7 +59,7 @@ st.markdown("""
     border: none;
 }
 
-/* Upload ohne gestrichelte Linie */
+/* Upload */
 .stFileUploader {
     border: none !important;
     padding: 15px;
@@ -80,26 +80,23 @@ st.markdown("""
     border-radius: 12px;
 }
 
-/* Status Box Basis */
+/* Status Box */
 .status-box {
     padding: 15px;
     border-radius: 12px;
     margin-top: 10px;
 }
 
-/* Erfolgsbox */
 .success {
     background: #e6f4ea;
     border-left: 6px solid #2e7d32;
 }
 
-/* ⚠️ NEU: Pastell statt Rot/Gelb */
 .warning {
     background: #F3F6F4;
     border-left: 6px solid #A8B5A2;
 }
 
-/* (optional bleibt drin, aber nicht mehr genutzt) */
 .error {
     background: #fdecea;
     border-left: 6px solid #c62828;
@@ -207,7 +204,11 @@ if uploaded_file:
     image.thumbnail((512, 512))
     image = image.convert("RGB")
 
-    st.image(image, use_column_width=True)
+    # 📌 ZENTRIERTES BILD
+    col1, col2, col3 = st.columns([1, 2, 1])
+
+    with col2:
+        st.image(image, width=350)
 
     st.write("Analyse läuft...")
 
