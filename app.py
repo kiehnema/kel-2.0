@@ -128,6 +128,12 @@ Analyse starten
 </h2>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<p style="font-size:14px; opacity:0.75; margin-top:5px; margin-bottom:15px;">
+Lade ein möglichst klares Bild einer Wildpflanze hoch. Für die beste Erkennung sollten Blätter und Blüte gut sichtbar sein.
+</p>
+""", unsafe_allow_html=True)
+
 # =============================
 # MODEL
 # =============================
