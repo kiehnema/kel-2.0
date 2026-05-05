@@ -294,4 +294,4 @@ if uploaded_file:
         """, unsafe_allow_html=True)
 
     elif confidence >= 0.50:
-        st.error("Keine Daten in der Datenbank gefunden")
+        st.error("Diese Pflanze ist noch nicht in unserer Datenbank vorhanden. Daher können wir aktuell keine Empfehlungen geben.")
