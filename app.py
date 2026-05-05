@@ -215,7 +215,6 @@ if uploaded_file:
 
     st.subheader("Ergebnisse")
 
-    # 🔥 Top-Ergebnis markieren
     for i, (l, s) in enumerate(top3):
         if i == 0:
             st.markdown(f"**{l} ({round(float(s)*100,2)}%) — Top-Auswahl**")
@@ -294,4 +293,4 @@ if uploaded_file:
         """, unsafe_allow_html=True)
 
     elif confidence >= 0.50:
-        st.error("Diese Pflanze ist noch nicht in unserer Datenbank vorhanden. Daher können wir aktuell keine Empfehlungen geben.")
+        st.info("Diese Pflanze ist noch nicht in unserer Datenbank vorhanden. Daher können wir aktuell keine Empfehlungen geben.")
